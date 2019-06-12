@@ -11,9 +11,9 @@ SCOPES = ['https://www.googleapis.com/auth/calendar.readonly',
 'https://www.googleapis.com/auth/calendar',
 ]
 
-def stablish_callendar_connection():
+def stablish_calendar_connection():
     """
-    Stablish Connection with Google Callendar API
+    Stablish Connection with Google calendar API
     """
     creds = None
     # The file token.pickle stores the user's access and refresh tokens, and is
