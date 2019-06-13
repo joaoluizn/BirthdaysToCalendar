@@ -103,6 +103,10 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# VS Code
+.vscode
+
 # Google API Callendar
 *.pickle
 credentials.json
+*.ics
