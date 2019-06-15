@@ -39,6 +39,8 @@ Enable Google Calendar API for your Google Account:
 Download your Birthdays ICS file from your facebook Events page:
 - Access [Facebook Event Page](https://www.facebook.com/events/)
 - Scroll Down untill you find this section:
+
+![facebook-birthdays-section](https://github.com/joaoluizn/BirthdaysToCalendar/blob/master/doc/fb-gif.gif)
 - Click `Birthdays` to Download friends Birthdays
 - Save this file inside project `src` folder and rename it to `events.ics`
 
