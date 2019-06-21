@@ -2,6 +2,8 @@
 
 This Project was created for those who want to remember friends birthdays but don't use facebook anymore.
 
+**NOTE: (20/06/2019) Due to a recent update on Facebook, they removed the option to download the .ICS File. but if you have any other .ics containing Birthdays data, it should work too. But for now, i'm suspend the support for this Repo, feel free to change for your needs.**
+
 With small steps its possible to transfer birthdays from Facebook to Google Calendar.
 
 ## Requirements:
