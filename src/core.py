@@ -1,34 +1,98 @@
-import json
-
+import argparse
 import utils.calendar_handler as cal_handler
-from network.connection import stablish_calendar_connection
-from utils.ics_handler import parse_ics
 
+from network.connection import stablish_calendar_connection
+
+parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter, description="BirthdaysToCalendar, a new approach to import friends birthdays from facebook to Google Calendar.")
+parser.add_argument(
+    '--import_birthdays', 
+    action="store_true", 
+    help="""Import your friends birthdays from facebook to Google Calendar.
+    Requires:
+    [--calendar CALENDAR_NAME], [--facebook_url FACEBOOK_BIRTHDAYS_URL], [--privacy PRIVACY_STATUS]
+    """)
+
+parser.add_argument(
+    '--calendar',
+    type=str,
+    metavar=('CALENDAR_NAME'),
+    help="""Calendar Name you want to work with.
+    
+    Used By:
+    [--import_birthdays], [--delete_all_birthdays]
+
+    Default:
+    If nothing given, a default of name 'Birthdays Calendar' will be created.
+    """,
+    default="Birthdays Calendar"
+)
+
+parser.add_argument(
+    '--birthdays_url',
+    type=str,
+    metavar=('BIRTHDAYS_URL'),
+    help="""The URL link that contains your friends birthdays data.
+    
+    Required By:
+    [--import_birthdays]
+
+    More about how to obtain this on README.
+    """
+)
+
+parser.add_argument(
+    '--visibility',
+    type=str,
+    metavar=('VISIBILITY_STATUS'),
+    help="""If you want your events to be public or private.
+    
+    Options:
+        private: The event is public and event details are visible to all readers of the calendar.
+        public: The event is private and only event attendees may view event details.
+
+    Required By:
+    [--import_birthdays]
+
+    Default: 
+        private
+    """,
+    default='private'
+)
+
+parser.add_argument(
+    '--delete_all_birthdays', 
+    action='store_true',
+    help="""All birthdays added by BirthdaysToCalendar for a specific calendar will be deleted
+    
+    Requires:
+    [--calendar CALENDAR_NAME]
+    """)
 
 if __name__ == '__main__':
-    calendar_name = 'Birthdays T1'
+    args = parser.parse_args()
 
-    # Creating Connecton with Google Calendar API
-    conn = stablish_calendar_connection()
+    if args.import_birthdays and args.delete_all_birthdays:
+        parser.error('Only one main routine can be executed [--delete_all_birthdays or --import_birthdays]')
 
-    # Create birthday calendar if needed
-    birthday_calendar_id = cal_handler.create_birthday_calendar(conn, calendar_name)
+    elif args.import_birthdays and not args.delete_all_birthdays:
+        if args.calendar and args.birthdays_url and args.visibility:
+            conn = stablish_calendar_connection()
+            calendar_name = args.calendar
+            birthdays_path = args.birthdays_url
+            visibility = args.visibility
 
-    friends_json = json.loads(parse_ics('events.ics'))
+            if visibility not in ['private', 'public']:
+                visibility = 'private'
 
-    # TODO: Filter people before add final list. 
+            birthday_calendar_id = cal_handler.create_birthday_calendar(conn, calendar_name)
+            cal_handler.import_ics_to_calendar(conn,birthday_calendar_id, birthdays_path, visibility)
+        else:
+            parser.error('[--import_birthdays] Requires at least BIRTHDAYS_URL to work')
 
-    friends_quantity = len(friends_json)
-    print(f'This may take a while depending on your friends number: {friends_quantity}')
-    
-    added_quantity = 0
-    for friend in friends_json:
-        event = cal_handler.new_birthday_event(
-            friend.get('name'), 
-            friend.get('start'), 
-            friend.get('uid'))
-        cal_handler.add_event_to_calendar(conn, birthday_calendar_id, event)
-        added_quantity += 1
-
-        if added_quantity % 20 == 0 or added_quantity == friends_quantity:
-            print(f'Progress: {added_quantity}/{friends_quantity}: {(added_quantity/friends_quantity)*100:.2f}%')
+    elif args.delete_all_birthdays and not args.import_birthdays:
+        if args.calendar:
+            conn = stablish_calendar_connection()
+            calendar_name = args.calendar
+            cal_handler.delete_all_birthdays(conn, calendar_name)
+        else:
+            parser.error('[--delete_all_birthdays] requires a CALENDAR_NAME to delete all birthdays events.')
