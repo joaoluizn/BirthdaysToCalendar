@@ -27,6 +27,7 @@ pipenv install
 after every thing is done, just enter:
 ```bash
 pipenv shell
+
 ```
 
 Everything is set and read to use now!
